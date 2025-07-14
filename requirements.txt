@@ -1,0 +1,11 @@
+requests
+beautifulsoup4
+selenium
+python-dotenv
+chromedriver-autoinstaller
+openai
+pytz
+yfinance
+pandas
+scikit-learn
+fredapi
