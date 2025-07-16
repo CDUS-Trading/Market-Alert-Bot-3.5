@@ -45,7 +45,7 @@ jobs:
         run: |
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'actions@github.com'
-          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/CDUS-Trading/Market-Alert-Bot-4.git
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/CDUS-Trading/Market-Alert-Bot-3.5.git
           git add market_predictions.csv
           git commit -m "📈 Update log on $(date -u)" || echo "No changes to commit"
           git push origin HEAD:main
