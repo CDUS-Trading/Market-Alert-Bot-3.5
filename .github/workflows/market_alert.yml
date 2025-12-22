@@ -2,14 +2,9 @@ name: Market Alert Bot
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'   # 8:00 AM Chicago time (CDT)
-    - cron: '30 16 * * 1-5'  # 11:30 AM Chicago time (CDT)
+  - cron: '0 13 * * 1-5'   # 8:00 AM Chicago time (CDT)
+  - cron: '30 16 * * 1-5'  # 11:30 AM Chicago time (CDT)
   workflow_dispatch:
-
-# Prevent two scheduled/manual runs from pushing to main at the same time
-concurrency:
-  group: market-alert-bot-main
-  cancel-in-progress: false
 
 jobs:
   run-alert:
@@ -17,10 +12,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_PAT }}
-          fetch-depth: 0  # required for rebase
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -45,43 +39,13 @@ jobs:
           EMAIL_TO: ${{ secrets.EMAIL_TO }}
         run: python spx_premarket_alerts.py
 
-      - name: Commit and push updated CSV log (rebase + retry)
+      - name: Commit and push updated CSV log
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
-        shell: bash
         run: |
-          set -euo pipefail
-
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-
-          # Ensure authenticated origin (checkout usually sets this, but keep it explicit)
-          git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/CDUS-Trading/Market-Alert-Bot-3.5.git"
-
-          # Stage only what you expect
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/CDUS-Trading/Market-Alert-Bot-3.5.git
           git add market_predictions.csv
-
-          # If nothing changed, exit cleanly
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git commit -m "📈 Update log on $(date -u '+%a %b %d %H:%M:%S UTC %Y')"
-
-          # Rebase onto latest origin/main and retry push to handle rare races
-          for i in 1 2 3 4 5; do
-            git fetch origin main
-            git rebase origin/main
-
-            if git push origin HEAD:main; then
-              echo "Push succeeded."
-              exit 0
-            fi
-
-            echo "Push failed (attempt $i). Retrying..."
-            sleep $((i * 2))
-          done
-
-          echo "Push failed after retries."
-          exit 1
+          git commit -m "📈 Update log on $(date -u)" || echo "No changes to commit"
+          git push origin HEAD:main
