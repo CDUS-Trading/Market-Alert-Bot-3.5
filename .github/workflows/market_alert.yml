@@ -2,7 +2,7 @@ name: Market Alert Bot
 
 on:
   schedule:
-    - cron: '0 13 * * 1-5'   # 8:00 AM Chicago time (CDT)
+    - cron: '10 14 * * 1-5'   # 8:00 AM Chicago time (CDT)
     - cron: '30 16 * * 1-5'  # 11:30 AM Chicago time (CDT)
   workflow_dispatch:
 
