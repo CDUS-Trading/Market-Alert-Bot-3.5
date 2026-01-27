@@ -226,7 +226,7 @@ def get_trade_label_for_subject():
     # small window to tolerate GitHub delays
     if h == 8 and 5 <= m <= 20:
         return "8:30 Trade"
-    elif h == 11 and 10 <= m <= 25:
+    elif h == 11 and 10 <= m <= 24:
         return "11:30 Trade"
     elif h == 11 and 25 <= m <= 45:
         return "12:00 Trade"
@@ -369,6 +369,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
