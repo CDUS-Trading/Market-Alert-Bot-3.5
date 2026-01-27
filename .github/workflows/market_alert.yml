@@ -10,7 +10,7 @@ on:
 # Prevent two scheduled/manual runs from pushing to main at the same time
 concurrency:
   group: market-alert-bot-main
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   run-alert:
