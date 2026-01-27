@@ -217,6 +217,22 @@ def log_premarket_prediction(date, spx, es, vix, sentiment_score, direction, mov
             writer.writerow(["date", "spx", "es", "vix", "sentiment_score", "predicted_trend", "predicted_move_pts"])
         writer.writerow([date, spx, es, vix, sentiment_score, direction, move_pts])
 
+def get_trade_label_for_subject():
+    chicago = pytz.timezone("America/Chicago")
+    now = datetime.datetime.now(chicago)
+
+    h, m = now.hour, now.minute
+
+    # small window to tolerate GitHub delays
+    if h == 8 and 5 <= m <= 20:
+        return "8:30 Trade"
+    elif h == 11 and 10 <= m <= 25:
+        return "11:30 Trade"
+    elif h == 11 and 25 <= m <= 45:
+        return "12:00 Trade"
+    else:
+        return now.strftime("%I:%M %p %Z")  # fallback like "08:12 AM CST"
+
 # =============================
 # 📧 Email Notifier
 # =============================
@@ -333,8 +349,11 @@ def main():
 
 
     # 7. Send styled email
+    trade_label = get_trade_label_for_subject()
+    subject = f"📊 Pre-Market Alert — {trade_label}"
+
     send_email(
-        subject="📊 Pre-Market Alert",
+        subject=subject,
         spx=spx,
         vix=vix,
         es=es,
@@ -342,12 +361,15 @@ def main():
         news=news,
         direction=direction,
         reasons=reasons,
-        move_msg="N/A", 
+        move_msg="N/A",
         to_email=os.getenv("EMAIL_TO")
     )
 
+    
+
 if __name__ == "__main__":
     main()
+
 
 
 
