@@ -2,12 +2,12 @@ name: Market Alert Bot
 
 on:
   schedule:
-    - cron: '10 14 * * 1-5'   # 8:10 AM Chicago time (CDT)
-    - cron: '15 17 * * 1-5'   # 11:15 AM Chicago time(CST)
-    - cron: '30 16 * * 1-5'  # 11:30 AM Chicago time (CDT)
+    # GitHub cron is UTC
+    - cron: '10 14 * * 1-5'   # 14:10 UTC = 08:10 CST
+    - cron: '15 17 * * 1-5'   # 17:15 UTC = 11:15 CST
+    - cron: '30 17 * * 1-5'   # 17:30 UTC = 11:30 CST
   workflow_dispatch:
 
-# Prevent two scheduled/manual runs from pushing to main at the same time
 concurrency:
   group: market-alert-bot-main
   cancel-in-progress: true
@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_PAT }}
-          fetch-depth: 0  # required for rebase
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -35,6 +35,12 @@ jobs:
         uses: browser-actions/setup-chrome@latest
         with:
           chrome-version: stable
+
+      - name: Print trigger time (UTC / Chicago / PST)
+        run: |
+          echo "UTC:     $(date -u '+%Y-%m-%d %H:%M:%S')"
+          TZ=America/Chicago date '+Chicago: %Y-%m-%d %H:%M:%S %Z'
+          TZ=America/Los_Angeles date '+PST/PDT: %Y-%m-%d %H:%M:%S %Z'
 
       - name: Run market alert bot
         env:
@@ -52,37 +58,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-
-          # Ensure authenticated origin (checkout usually sets this, but keep it explicit)
           git remote set-url origin "https://x-access-token:${GH_PAT}@github.com/CDUS-Trading/Market-Alert-Bot-3.5.git"
-
-          # Stage only what you expect
           git add market_predictions.csv
-
-          # If nothing changed, exit cleanly
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0
           fi
-
           git commit -m "📈 Update log on $(date -u '+%a %b %d %H:%M:%S UTC %Y')"
-
-          # Rebase onto latest origin/main and retry push to handle rare races
           for i in 1 2 3 4 5; do
             git fetch origin main
             git rebase origin/main
-
             if git push origin HEAD:main; then
               echo "Push succeeded."
               exit 0
             fi
-
             echo "Push failed (attempt $i). Retrying..."
             sleep $((i * 2))
           done
-
           echo "Push failed after retries."
           exit 1
