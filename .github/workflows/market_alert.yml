@@ -3,9 +3,9 @@ name: Market Alert Bot
 on:
   schedule:
     # GitHub cron is UTC
-    - cron: '10 14 * * 1-5'   # 14:10 UTC = 08:10 CST
-    - cron: '15 17 * * 1-5'   # 17:15 UTC = 11:15 CST
-    - cron: '30 17 * * 1-5'   # 17:30 UTC = 11:30 CST
+    - cron: '40 13 * * 1-5'   # 07:40 CST (08:30 Trade )
+    - cron: '45 16 * * 1-5'   # 10:45 CST (11:30 Trade)
+    - cron: '30 17 * * 1-5'   # 17:30 UTC (12 Noon Trade)
   workflow_dispatch:
 
 concurrency:
