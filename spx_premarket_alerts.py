@@ -365,27 +365,27 @@ def main():
     now = now_chicago()
     print("Chicago current time:", now.strftime("%Y-%m-%d %I:%M %p %Z"))
 
-    # 1. For the 8:30 Trade (Triggered by Cron at 7:40 AM)
-    # We wait until 8:00 AM (30 mins before trade)
+    # --- 8:30 Trade (Signal at 8:00 AM) ---
     if now.hour < 9:
-        print("⏳ Waiting until 08:00 Chicago time...")
+        print("⏳ Waiting for 8:00 AM Signal (30m before 8:30 Trade)...")
         wait_until_chicago(8, 0, max_wait_minutes=60)
-        run_and_send("8:30 Trade")
+        run_and_send("8:30 Trade Signal")
         return
 
-    # 2. For the 11:30 Trade (Triggered by Cron at 10:45 AM)
-    # We wait until 11:00 AM (30 mins before trade)
+    # --- 11:30 Trade (Signal at 11:00 AM) ---
+    # Triggered by Cron at 10:45 AM
     if now.hour == 10:
-        print("⏳ Waiting until 11:00 Chicago time...")
+        print("⏳ Waiting for 11:00 AM Signal (30m before 11:30 Trade)...")
         wait_until_chicago(11, 0, max_wait_minutes=60)
-        run_and_send("11:30 Trade")
+        run_and_send("11:30 Trade Signal")
         return
 
-    # 3. For the 12:00 Trade (Triggered by Cron at 11:30 AM)
-    # We run IMMEDIATELY because it is already 11:30 (30 mins before trade)
-    if now.hour == 11 and now.minute >= 25:
-        print("🚀 Executing 12:00 Trade signal now...")
-        run_and_send("12:00 Trade")
+    # --- 12:00 Trade (Signal at 11:30 AM) ---
+    # Triggered by Cron at 11:25 AM
+    if now.hour == 11 and now.minute >= 20:
+        print("⏳ Waiting for 11:30 AM Signal (30m before 12:00 Trade)...")
+        wait_until_chicago(11, 30, max_wait_minutes=30)
+        run_and_send("12:00 Trade Signal")
         return
 
     print("Outside expected schedule window. Exiting.")
@@ -393,6 +393,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
