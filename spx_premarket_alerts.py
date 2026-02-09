@@ -362,11 +362,11 @@ def run_and_send(slot_label):
 # =============================
 
 def main():
-    def main():
     now = now_chicago()
     print("Chicago current time:", now.strftime("%Y-%m-%d %I:%M %p %Z"))
 
     # --- 8:30 Trade (Signal at 8:00 AM) ---
+    # Triggered by Cron at 7:40 AM CT
     if now.hour < 10:
         print("⏳ Waiting for 8:00 AM Signal...")
         wait_until_chicago(8, 0, max_wait_minutes=60)
@@ -374,7 +374,7 @@ def main():
         return
 
     # --- 11:30 Trade (Signal at 11:00 AM) ---
-    # Triggered at 10:45 AM, we want it to catch anything before 11:15
+    # Triggered by Cron at 10:45 AM CT
     if now.hour == 10 or (now.hour == 11 and now.minute < 15):
         print("⏳ Waiting for 11:00 AM Signal...")
         wait_until_chicago(11, 0, max_wait_minutes=60)
@@ -382,7 +382,7 @@ def main():
         return
 
     # --- 12:00 Trade (Signal at 11:30 AM) ---
-    # Triggered at 11:25 AM
+    # Triggered by Cron at 11:25 AM CT
     if now.hour == 11 and now.minute >= 15:
         print("⏳ Waiting for 11:30 AM Signal...")
         wait_until_chicago(11, 30, max_wait_minutes=30)
@@ -393,12 +393,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
