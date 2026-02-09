@@ -365,21 +365,26 @@ def main():
     now = now_chicago()
     print("Chicago current time:", now.strftime("%Y-%m-%d %I:%M %p %Z"))
 
-    # Morning run window: before 9:30
-    if now.hour < 9 or (now.hour == 9 and now.minute < 30):
-        print("⏳ Waiting until 08:10 Chicago time...")
-        wait_until_chicago(8, 10, max_wait_minutes=180)
+    # 1. For the 8:30 Trade (Triggered by Cron at 7:40 AM)
+    # We wait until 8:00 AM (30 mins before trade)
+    if now.hour < 9:
+        print("⏳ Waiting until 08:00 Chicago time...")
+        wait_until_chicago(8, 0, max_wait_minutes=60)
         run_and_send("8:30 Trade")
         return
 
-    # Midday run window: between 9:30 and 1:00 PM
-    if now.hour < 13:
-        print("⏳ Waiting until 11:15 Chicago time...")
-        wait_until_chicago(11, 15, max_wait_minutes=180)
+    # 2. For the 11:30 Trade (Triggered by Cron at 10:45 AM)
+    # We wait until 11:00 AM (30 mins before trade)
+    if now.hour == 10:
+        print("⏳ Waiting until 11:00 Chicago time...")
+        wait_until_chicago(11, 0, max_wait_minutes=60)
         run_and_send("11:30 Trade")
+        return
 
-        print("⏳ Waiting until 11:30 Chicago time...")
-        wait_until_chicago(11, 30, max_wait_minutes=90)
+    # 3. For the 12:00 Trade (Triggered by Cron at 11:30 AM)
+    # We run IMMEDIATELY because it is already 11:30 (30 mins before trade)
+    if now.hour == 11 and now.minute >= 25:
+        print("🚀 Executing 12:00 Trade signal now...")
         run_and_send("12:00 Trade")
         return
 
@@ -388,6 +393,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
