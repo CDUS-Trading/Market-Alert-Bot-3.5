@@ -499,3 +499,4 @@ date,spx,es,vix,sentiment_score,predicted_trend,predicted_move_pts
 2026-03-04,6877.62,N/A,21.0,3,📈 Bullish,N/A
 2026-03-05,6869.5,N/A,22.39,0,📉 Bearish,N/A
 2026-03-06,6830.71,N/A,27.74,0,📉 Bearish,N/A
+2026-03-06,6752.16,N/A,26.55,-3,📉 Bearish,N/A
